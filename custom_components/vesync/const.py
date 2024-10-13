@@ -79,11 +79,19 @@ SENSOR_TYPES_AIRFRYER = {
     ],
     "cook_set_temp": [
         "set_temperature",
-        "Set temperature",
+        "Cook set temperature",
         UnitOfTemperature.CELSIUS,
         None,
         SensorDeviceClass.TEMPERATURE,
         "cook_set_temp",
+    ],
+    "cook_set_time": [
+        "set_time",
+        "Cook set time",
+        UnitOfTime.MINUTES,
+        "mdi:timer",
+        UnitOfTime.MINUTES,
+        "cook_set_time",
     ],
     "cook_last_time": [
         "cook_last_time",
@@ -92,6 +100,14 @@ SENSOR_TYPES_AIRFRYER = {
         "mdi:timer",
         UnitOfTime.MINUTES,
         "cook_last_time",
+    ],
+    "preheat_set_time": [
+        "preheat_set_time",
+        "Preheat set time",
+        UnitOfTime.MINUTES,
+        "mdi:timer",
+        UnitOfTime.MINUTES,
+        "preheat_set_time",
     ],
     "preheat_last_time": [
         "preheat_last_time",

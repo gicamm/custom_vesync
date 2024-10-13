@@ -88,9 +88,8 @@ class VeSyncairfryerSensor(VeSyncBaseEntity, BinarySensorEntity):
     @property
     def is_on(self) -> bool:
         """Return a value indicating whether the Humidifier's water tank is lifted."""
-        value = getattr(self.airfryer, self.stype[0], None)
+        value = getattr(self.airfryer.fryer_status, self.stype[0], None)
         return value
-        # return self.smarthumidifier.details["water_tank_lifted"]
 
     @property
     def icon(self):

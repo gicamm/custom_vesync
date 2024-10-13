@@ -111,7 +111,7 @@ class VeSyncairfryerSensor(VeSyncBaseEntity, SensorEntity):
     @property
     def native_value(self):
         """Return the value."""
-        value = getattr(self.airfryer, self.stype[5], None)
+        value = getattr(self.airfryer.fryer_status, self.stype[5], None)
         return value
 
     @property

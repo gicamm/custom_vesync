@@ -15,11 +15,10 @@ _LOGGER = logging.getLogger(__name__)
 
 SENSOR_TYPES_CS158 = {
     # unique_id,name # icon,
-    "end": [
-        "end",
-        "End cooking or preheating ",
-        "mdi:stop",
-    ],
+    "preheat": ["set_preheat", "Preheat", "mdi:heat-wave", "time;temperature"],
+    "cook": ["cook", "Cook", "mdi:chef-hat", "time;temperature"],
+    "pause": ["pause", "Pause cooking or preheating", "mdi:pause", ""],
+    "end": ["end", "End cooking or preheating", "mdi:stop", ""],
 }
 
 
@@ -91,5 +90,12 @@ class VeSyncairfryerButton(VeSyncBaseEntity, ButtonEntity):
         return self.stype[2]
 
     def press(self) -> None:
-        """Return True if device is on."""
-        self.airfryer.end()
+        """Call the function"""
+        method = getattr(self.airfryer, self.stype[0])
+        if not self.stype[3]:
+            method()
+        else:
+            args = self.stype[3].split(";")
+            temperature = 200  # TODO
+            time = 10  # TODO
+            method(temperature, time)
