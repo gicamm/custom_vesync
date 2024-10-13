@@ -46,18 +46,13 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
     """Set up Vesync as config entry."""
     username = config_entry.data[CONF_USERNAME]
     password = config_entry.data[CONF_PASSWORD]
-
     time_zone = str(hass.config.time_zone)
 
-    manager = VeSync(username, password, time_zone)
+    manager = VeSync(username, password, time_zone, debug=False)  # Add property
 
-    login = await hass.async_add_executor_job(manager.login)
-
-    if not login:
+    if not await hass.async_add_executor_job(manager.login):  # login check
         _LOGGER.error("Unable to login to the VeSync server")
         return False
-
-    forward_setup = hass.config_entries.async_forward_entry_setup
 
     hass.data[DOMAIN] = {config_entry.entry_id: {}}
     hass.data[DOMAIN][config_entry.entry_id][VS_MANAGER] = manager
@@ -86,11 +81,16 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
 
     device_dict = await async_process_devices(hass, manager)
 
+    # Initialize platform data
     for p, vs_p in PLATFORMS.items():
         hass.data[DOMAIN][config_entry.entry_id][vs_p] = []
         if device_dict[vs_p]:
             hass.data[DOMAIN][config_entry.entry_id][vs_p].extend(device_dict[vs_p])
-            hass.async_create_task(forward_setup(config_entry, p))
+
+    # Forward the config entry to all platforms
+    await hass.config_entries.async_forward_entry_setups(
+        config_entry, list(PLATFORMS.keys())
+    )
 
     async def async_new_device_discovery(service: ServiceCall) -> None:
         """Discover if new devices should be added."""
@@ -100,19 +100,20 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
         def _add_new_devices(platform: str) -> None:
             """Add new devices to hass."""
             old_devices = hass.data[DOMAIN][config_entry.entry_id][PLATFORMS[platform]]
-            if new_devices := list(
-                set(dev_dict.get(VS_SWITCHES, [])).difference(old_devices)
-            ):
-                old_devices.extend(new_devices)
-                if old_devices:
-                    async_dispatcher_send(
-                        hass, VS_DISCOVERY.format(PLATFORMS[platform]), new_devices
-                    )
-                else:
-                    hass.async_create_task(forward_setup(config_entry, platform))
+            new_devices = list(
+                set(dev_dict.get(PLATFORMS[platform], [])).difference(old_devices)
+            )
 
-        for k, v in PLATFORMS.items():
-            _add_new_devices(k)
+            if new_devices:
+                old_devices.extend(new_devices)
+                async_dispatcher_send(
+                    hass, VS_DISCOVERY.format(PLATFORMS[platform]), new_devices
+                )
+            else:
+                _LOGGER.info(f"No new devices found for platform {platform}")
+
+        for platform in PLATFORMS.keys():
+            _add_new_devices(platform)
 
     hass.services.async_register(
         DOMAIN, SERVICE_UPDATE_DEVS, async_new_device_discovery

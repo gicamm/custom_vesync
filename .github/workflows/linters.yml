@@ -1,6 +1,7 @@
 name: Linters (flake8, black, isort)
 
 on:
+  push:
   pull_request:
 
 jobs:
