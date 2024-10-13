@@ -7,7 +7,7 @@ from homeassistant.components.sensor import (
     SensorStateClass,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import ENERGY_KILO_WATT_HOUR, PERCENTAGE, POWER_WATT
+from homeassistant.const import PERCENTAGE, UnitOfEnergy, UnitOfPower
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity import EntityCategory
@@ -170,7 +170,7 @@ class VeSyncPowerSensor(VeSyncOutletSensorEntity):
     @property
     def native_unit_of_measurement(self):
         """Return the Watt unit of measurement."""
-        return POWER_WATT
+        return UnitOfPower.WATT
 
     @property
     def state_class(self):
@@ -214,7 +214,7 @@ class VeSyncEnergySensor(VeSyncOutletSensorEntity):
     @property
     def native_unit_of_measurement(self):
         """Return the kWh unit of measurement."""
-        return ENERGY_KILO_WATT_HOUR
+        return UnitOfEnergy.KILO_WATT_HOUR
 
     @property
     def state_class(self):

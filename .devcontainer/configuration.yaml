@@ -1,0 +1,8 @@
+# Loads default set of integrations. Do not remove.
+default_config:
+
+logger:
+  default: info
+  logs:
+    custom_components.vesync.hub: debug
+    custom_components.vesync.vedo: debug
